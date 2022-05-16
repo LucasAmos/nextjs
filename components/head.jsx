@@ -11,6 +11,8 @@ export default function head() {
         property="og:image"
         content="https://lucasamos.dev/static/ad1dd43a1f5b7b097de944e9a5f84494/2a4de/terraform.png"
       />
+
+      <meta property="og:title" content="next title" />
     </Head>
   );
 }
