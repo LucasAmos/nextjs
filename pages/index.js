@@ -2,7 +2,12 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
-export default function Home() {
+import Link from "next/link";
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+
+export default function Home({ allPostsData }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -15,59 +20,70 @@ export default function Home() {
         />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="blog/my-mdx-page" className={styles.card}>
-            <h2>blog post &rarr;</h2>
-            <p>blog post</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 p-4 md:p-0">
+        {allPostsData.map((post, index) => {
+          return (
+            <div
+              key={index}
+              className="p-5 border border-gray-200 m-2 rounded-xl shadow-lg overflow-hidden flex flex-col"
+            >
+              <Link key={index} href={`articles/${post.slug}`} passHref>
+                <div>
+                  <h2> {post.title}</h2>
+                  <p>{post.description}</p>
+                  <Image
+                    className="bob-image"
+                    src={post.thumbnailUrl}
+                    alt="Vercel Logo"
+                    width={600}
+                    height={314}
+                  />
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
+}
+
+export async function getStaticProps() {
+  // Get file names under /posts
+  const postsDirectory = path.join(process.cwd(), "pages/articles");
+  const fileNames = fs.readdirSync(postsDirectory);
+  const allPostsData = fileNames.map((fileName) => {
+    // Remove ".md" from file name to get id
+    const slug = fileName.replace(/\.mdx$/, "");
+
+    // Read markdown file as string
+    const fullPath = path.join(postsDirectory, fileName);
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+
+    // Use gray-matter to parse the post metadata section
+    const matterResult = matter(fileContents);
+
+    // Combine the data with the id
+    return {
+      fullPath,
+      slug,
+      ...matterResult.data,
+    };
+  });
+  // Sort posts by date
+  allPostsData.sort(({ date: a }, { date: b }) => {
+    if (a < b) {
+      return 1;
+    } else if (a > b) {
+      return -1;
+    } else {
+      return 0;
+    }
+  });
+
+  return {
+    props: {
+      allPostsData,
+    },
+  };
 }

@@ -1,0 +1,30 @@
+---
+title: page2
+date: "August 4, 2020"
+description: Learn how to create and use functions2
+thumbnailUrl: "/jest.png"
+tags: ["functions", "javascript"]
+---
+
+import Highlighter from "../../components/highlighter";
+
+# My MDX page
+
+PAGE 2
+
+<Highlighter>
+
+{ `import AWS from "aws-sdk";
+
+AWS.config.update({ region: process.env.AWS_REGION });
+const SM = new AWS.SecretsManager();
+
+export default async function handler(): Promise<string> {
+const { SecretString } = await SM.getSecretValue({SecretId: "secret1"}).promise();
+const { SecretString: SecretString2 } = await SM.getSecretValue({SecretId: "secret2"}).promise();
+
+    return \`\${SecretString} and \${SecretString2}\`;
+
+}`}
+
+</Highlighter>

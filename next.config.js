@@ -1,17 +1,12 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
-
-module.exports = nextConfig;
+const nextConfig = {};
 
 const withMDX = require("@next/mdx")({
+  reactStrictMode: true,
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [],
-    rehypePlugins: [],
-    // If you use `MDXProvider`, uncomment the following line.
-    // providerImportSource: "@mdx-js/react",
+    rehypePlugins: [], // If you use `MDXProvider`, uncomment the following line.
+    providerImportSource: "@mdx-js/react",
   },
 });
 module.exports = withMDX({
